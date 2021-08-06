@@ -5,12 +5,19 @@ import com.lz.springcloud.entities.Payment;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.web.bind.annotation.*;
 import com.lz.springcloud.service.PaymentService;
+
+import java.util.List;
 
 @RestController
 @Slf4j
 public class PaymentController {
+
+    @Autowired
+    private DiscoveryClient discoveryClient;
 
     @Autowired
     private PaymentService paymentService;
@@ -44,6 +51,20 @@ public class PaymentController {
         }else {
             return new CommonResult(444,"查询失败,没有对应记录"+id,null);
         }
+    }
+
+    @GetMapping("/payment/discovery")
+    public Object discovery(){
+        List<String> services = discoveryClient.getServices();
+        for (String service : services) {
+            log.info("******service:"+service);
+        }
+
+        List<ServiceInstance> instances = discoveryClient.getInstances("CLOUD-PAYMENT-SERVICE");
+        for (ServiceInstance instance : instances) {
+            log.info(instance.getServiceId()+"\t"+instance.getHost()+"\t"+instance.getPort()+"\t"+instance.getUri());
+        }
+        return this.discoveryClient;
     }
 
 }
