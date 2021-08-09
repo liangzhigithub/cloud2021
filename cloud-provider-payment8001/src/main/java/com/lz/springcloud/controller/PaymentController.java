@@ -1,5 +1,6 @@
 package com.lz.springcloud.controller;
 
+import cn.hutool.core.lang.copier.SrcToDestCopier;
 import com.lz.springcloud.entities.CommonResult;
 import com.lz.springcloud.entities.Payment;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import com.lz.springcloud.service.PaymentService;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @Slf4j
@@ -40,7 +42,7 @@ public class PaymentController {
     }
 
 
-    @GetMapping("payment/get/{id}")
+    @GetMapping("/payment/get/{id}")
     public CommonResult<Payment> getPaymentById(@PathVariable("id") Long id){
 
         Payment payment = paymentService.getPaymentById(id);
@@ -67,4 +69,16 @@ public class PaymentController {
         return this.discoveryClient;
     }
 
+    @GetMapping(value = "/payment/lb")
+    public String getPaymentLB(){
+        return serverPort;
+    }
+
+
+    @GetMapping("/payment/feign/timeout")
+    public String paymentFeignTimeout() throws InterruptedException {
+
+        TimeUnit.SECONDS.sleep(3);
+        return serverPort;
+    }
 }
